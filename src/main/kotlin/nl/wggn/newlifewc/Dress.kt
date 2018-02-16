@@ -110,8 +110,8 @@ fun createBabydoll(style: Style, colourParam: Colour?, topTypeParam: TopType?, f
             else -> Colour.BLUE
         }
         else -> when (rnd10()) {
-            0,1 -> Colour.WHITE
-            2,3 -> Colour.PINK
+            0, 1 -> Colour.WHITE
+            2, 3 -> Colour.PINK
             in 4..7 -> Colour.BLACK
             8 -> Colour.RED
             else -> Colour.BLUE
@@ -179,3 +179,139 @@ fun createCuteBabydoll(colourParam: Colour?, topTypeParam: TopType?): Dress {
     flags.forEach(dress::addFlag)
     return dress
 }
+
+fun createSummerDress(style: Style, variantParam: Variant?, colourParam: Colour?, lengthParam: Length?, topTypeParam: TopType?, flagsParam: Map<Flag, Boolean>): Dress {
+    val flags = mutableListOf(Flag.SINGULAR, Flag.THIN)
+    var attractive = 6
+    var cute = 2
+    var elegant = 3
+    val length = lengthParam ?: getDressLength(style)
+    val st = "summer dress"
+    val detailDesc = "A lightweight loose dress that you could wear out in the day"
+    val topType = topTypeParam ?: when (style) {
+        Style.CUTE -> when (rnd10()) {
+            in 0..5 -> TopType.STRAPPY
+            6 -> TopType.ZIP
+            else -> TopType.BUTTONS
+        }
+        Style.PROVOCATIVE -> when (rnd10()) {
+            in 0..5 -> TopType.STRAPPY
+            6 -> TopType.ZIP
+            else -> TopType.HALTERTOP
+        }
+        Style.ELEGANT -> when (rnd10()) {
+            in 0..5 -> TopType.STRAPPY
+            else -> TopType.ZIP
+        }
+        else -> when (rnd10()) {
+            in 0..5 -> TopType.STRAPPY
+            6 -> TopType.ZIP
+            7, 8 -> TopType.BUTTONS
+            else -> TopType.HALTERTOP
+        }
+    }
+
+    if (topType == TopType.ZIP) elegant += 2
+    else if (topType == TopType.BUTTONS) {
+        cute += 2
+        elegant -= 1
+    } else if (topType == TopType.HALTERTOP) cute -= 1
+
+    val colour = colourParam ?: when (style) {
+        Style.CUTE -> when (rnd10()) {
+            in 0..3 -> Colour.WHITE
+            in 5..8 -> Colour.PINK
+            else -> Colour.YELLOW
+        }
+        Style.CHEERFUL -> when (rnd10()) {
+            0, 1 -> Colour.RED
+            2 -> Colour.GREEN
+            3 -> Colour.PURPLE
+            4, 5, 6 -> Colour.YELLOW
+            7, 8 -> Colour.ORANGE
+            else -> Colour.BLUE
+        }
+        Style.ELEGANT -> when (rnd10()) {
+            0, 1, 2 -> Colour.WHITE
+            3 -> Colour.CREAM
+            4 -> Colour.BLACK
+            5 -> Colour.GREEN
+            6 -> Colour.YELLOW
+            7 -> Colour.PURPLE
+            else -> Colour.BLUE
+        }
+        Style.PROVOCATIVE -> when (rnd10()) {
+            0 -> Colour.CREAM
+            1, 2, 3 -> Colour.RED
+            4, 5 -> Colour.BLUE
+            6, 7 -> Colour.GREEN
+            else -> Colour.YELLOW
+        }
+        Style.BUSINESSLIKE -> when (rnd10()) {
+            0, 1 -> Colour.WHITE
+            2 -> Colour.BLACK
+            3 -> Colour.BROWN
+            4 -> Colour.GREY
+            5, 6 -> Colour.GREEN
+            7 -> Colour.PURPLE
+            else -> Colour.BLUE
+        }
+        else -> when (rnd10()) {
+            0, 1, 2 -> Colour.WHITE
+            3 -> Colour.PURPLE
+            4 -> Colour.PINK
+            5 -> Colour.RED
+            6 -> Colour.BLUE
+            7 -> Colour.GREEN
+            else -> Colour.YELLOW
+        }
+    }
+
+    if (colour == Colour.WHITE) cute += 1
+    else if (colour == Colour.PINK) cute += 3
+
+    if (flagsParam.getOrDefault(Flag.LOW_CUT, style != Style.CUTE && style != Style.WHOLESOME &&
+                    topType != TopType.HALTERTOP && topType != TopType.STRAPLESS &&
+                    rnd10() < when (style) {
+                Style.PROVOCATIVE -> 9
+                Style.BUSINESSLIKE -> 4
+                else -> 5
+            })) {
+        flags += Flag.LOW_CUT
+        attractive += 1
+        cute -= 3
+        elegant -= 3
+    }
+
+    val shortDesc = colour.desc + " " + st
+
+    val price = 35 + (if (Flag.CLINGY in flags) 5 else 0) + if (length == Length.ANKLES) 5 else 0
+
+    val dress = Dress(listOf(OutfitType.CASUAL), colour, length, topType, attractive, cute, elegant, shortDesc, "dress", st, detailDesc, price)
+    flags.forEach(dress::addFlag)
+    return dress
+}
+
+fun getDressLength(style: Style): Length =
+        when (style) {
+            Style.ELEGANT -> when (rnd10()) {
+                0 -> Length.THIGH
+                in 1..4 -> Length.KNEES
+                else -> Length.ANKLES
+            }
+            Style.PROVOCATIVE -> Length.THIGH
+            Style.WHOLESOME -> when (rnd10()) {
+                in 0..5 -> Length.KNEES
+                else -> Length.ANKLES
+            }
+            Style.BUSINESSLIKE -> when (rnd10()) {
+                0, 1 -> Length.THIGH
+                in 2..7 -> Length.KNEES
+                else -> Length.ANKLES
+            }
+            else -> when (rnd10()) {
+                in 0..3 -> Length.THIGH
+                in 4..7 -> Length.KNEES
+                else -> Length.ANKLES
+            }
+        }
