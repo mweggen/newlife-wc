@@ -315,3 +315,74 @@ fun getDressLength(style: Style): Length =
                 else -> Length.ANKLES
             }
         }
+
+fun createSlip(style: Style, variantParam: Variant?, colourParam: Colour?, lengthParam: Length?, topTypeParam: TopType?, flagsParam: Map<Flag, Boolean>): Dress {
+    val flags = mutableListOf(Flag.SINGULAR, Flag.THIN)
+    val topType = topTypeParam ?: if (rnd10() < 8) TopType.STRAPPY else TopType.HALTERTOP
+    var attractive = 8
+    var cute = -1
+    var elegant = 5
+    val colour = colourParam ?: when (style) {
+        Style.PROVOCATIVE -> when (rnd10()) {
+            0 -> Colour.CREAM
+            1, 2, 3 -> Colour.BLACK
+            4, 5, 6 -> Colour.RED
+            7, 8 -> Colour.PURPLE
+            else -> Colour.BLUE
+        }
+        Style.CUTE -> when (rnd10()) {
+            0, 1, 2 -> Colour.WHITE
+            in 3..6 -> Colour.PINK
+            7 -> Colour.YELLOW //todo PURPLE?
+            else -> Colour.BLUE
+        }
+        Style.CHEERFUL -> when (rnd10()) {
+            0, 1, 2 -> Colour.YELLOW
+            3 -> Colour.PINK
+            4, 5, 6 -> Colour.RED
+            7 -> Colour.PURPLE
+            8 -> Colour.GREEN
+            else -> Colour.BLUE
+        }
+        else -> when (rnd10()) {
+            0 -> Colour.WHITE
+            1 -> Colour.CREAM
+            2 -> Colour.PINK
+            3, 4 -> Colour.BLACK
+            5 -> Colour.RED
+            6 -> Colour.GREEN
+            7 -> Colour.PURPLE
+            8 -> Colour.YELLOW
+            else -> Colour.BLUE
+        }
+    }
+
+    when (colour) {
+        Colour.PINK -> cute += 3
+        Colour.WHITE -> cute += 1
+        Colour.RED, Colour.BLACK -> cute -= 1
+        Colour.CREAM -> elegant += 1
+        Colour.YELLOW -> elegant -= 1
+    }
+
+    val basicDesc = "slip"
+    val shortType = "satin " + basicDesc
+    val shortDesc = (if (flagsParam.getOrDefault(Flag.LOW_CUT, topType != TopType.HALTERTOP && topType != TopType.STRAPLESS &&
+                    rnd10() < when (style) {
+                Style.PROVOCATIVE -> 8
+                Style.WHOLESOME, Style.CUTE -> 2
+                else -> 5
+            })) {
+        flags += Flag.LOW_CUT
+        attractive += 1
+        cute -= 2
+        "lowcut "
+    } else "") + colour.desc + " " + shortType
+
+    val detailAppend = "Made of smooth satin with titillating lace trim, this is an alluring and sensual piece of clothing. "
+
+    val dress = Dress(listOf(OutfitType.SEXY_NIGHTWEAR), colour, Length.THIGH, topType, attractive, cute, elegant,
+            shortDesc, basicDesc, shortType, detailAppend, 40)
+    flags.forEach(dress::addFlag)
+    return dress
+}

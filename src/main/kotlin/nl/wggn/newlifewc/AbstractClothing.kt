@@ -444,7 +444,7 @@ enum class SubCategory(val category: Category, val create: (s: Style, v: Variant
     FLAMENCO(Category.DRESS, ::createFlamencoDress),
     DRESS(Category.DRESS),
     BABYDOLL(Category.DRESS, ::createBabydoll),
-    SLIP(Category.DRESS),
+    SLIP(Category.DRESS, ::createSlip),
     SUMMER_DRESS(Category.DRESS, ::createSummerDress),
 
     SPORTS_SKIRT(Category.SKIRT, ::createSportsSkirt),
