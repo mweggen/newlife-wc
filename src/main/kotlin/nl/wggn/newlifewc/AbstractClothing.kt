@@ -40,7 +40,9 @@ class Test : Application() {
         val scene = Scene(grid, 800.0, 600.0)
         stage.scene = scene
 
-        val clothingList: ObservableList<AbstractClothing> = FXCollections.observableArrayList(createWorkTrousers(), createYogaPants(PROVOCATIVE), createYogaPants(CUTE))
+//        val NO_TOP = todo
+
+        val clothingList: ObservableList<AbstractClothing> = FXCollections.observableArrayList()
         val listView = ListView<AbstractClothing>()
 
         val pane = FlowPane()
@@ -442,7 +444,7 @@ enum class SubCategory(val category: Category, val create: (s: Style, v: Variant
     ANY(Category.ANY),
 
     FLAMENCO(Category.DRESS, ::createFlamencoDress),
-    DRESS(Category.DRESS),
+    DRESS(Category.DRESS, ::createDress),
     BABYDOLL(Category.DRESS, ::createBabydoll),
     SLIP(Category.DRESS, ::createSlip),
     SUMMER_DRESS(Category.DRESS, ::createSummerDress),
@@ -453,12 +455,12 @@ enum class SubCategory(val category: Category, val create: (s: Style, v: Variant
     DENIM_SKIRT(Category.SKIRT),
     SKIRT(Category.SKIRT, ::createSkirt),
 
-    WORK_TROUSERS(Category.PANTS),
-    YOGA_PANTS(Category.PANTS),
-    TRACKSUIT_BOTTOMS(Category.PANTS),
+    WORK_TROUSERS(Category.PANTS, ::createWorkTrousers),
+    YOGA_PANTS(Category.PANTS, ::createYogaPants),
+    TRACKSUIT_BOTTOMS(Category.PANTS, ::createTracksuitBottoms),
     PYJAMA_BOTTOMS(Category.PANTS),
     HOTPANTS(Category.PANTS),
-    BIKE_SHORTS(Category.PANTS),
+    BIKE_SHORTS(Category.PANTS, ::createBikeShorts),
     SHORTS(Category.PANTS),
     JEANS(Category.PANTS),
 

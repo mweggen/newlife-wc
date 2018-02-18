@@ -6,8 +6,8 @@ class Pants(type: List<OutfitType>, removeDiff: Int, colour: Colour, attractive:
     override val skirt = false
 }
 
-fun createWorkTrousers(): Pants {
-    val colour = when (rnd10()) {
+fun createWorkTrousers(style: Style, variant: Variant?, colourParam: Colour?, lengthParam: Length?, topType: TopType?, flagsParam: Map<Flag, Boolean>): Pants {
+    val colour = colourParam ?: when (rnd10()) {
         in 0..4 -> Colour.BLACK
         5 -> Colour.BROWN
         6, 7 -> Colour.GREY
@@ -20,11 +20,11 @@ fun createWorkTrousers(): Pants {
             35, basicDesc, length, getPantsDetail(shortDesc, length, listOf()))
 }
 
-fun createYogaPants(style: Style): Pants {
+fun createYogaPants(style: Style, variant: Variant?, colourParam: Colour?, lengthParam: Length?, topType: TopType?, flagsParam: Map<Flag, Boolean>): Pants {
     val length = Length.ANKLES
     val flags = listOf(Flag.CLINGY, Flag.PULL_DOWN, Flag.BOOST_ATHLETIC_ELEGANCE)
     val st = "yoga pants"
-    val colour = getAthleticLongPantsColour(style)
+    val colour = colourParam ?: getAthleticLongPantsColour(style)
     val cute = if (colour == Colour.PINK) 1 else 0
     val shortDesc = colour.desc + " " + st
     val detailDesc = getPantsDetail(shortDesc, length, flags) + "\nFlexible tight-fitting trousers designed for the practice of yoga, but that can also be worn casually. "
@@ -33,10 +33,10 @@ fun createYogaPants(style: Style): Pants {
     return pants
 }
 
-fun createTracksuitBottoms(style: Style): Pants {
+fun createTracksuitBottoms(style: Style, variant: Variant?, colourParam: Colour?, lengthParam: Length?, topType: TopType?, flagsParam: Map<Flag, Boolean>): Pants {
     val flags = listOf(Flag.PULL_DOWN)
     val length = Length.ANKLES
-    val colour = getAthleticLongPantsColour(style)
+    val colour = colourParam ?: getAthleticLongPantsColour(style)
     val st = "tracksuit bottoms"
     val cute = if (colour == Colour.PINK) 1 else 0
     val shortDesc = colour.desc + " " + st
@@ -47,11 +47,11 @@ fun createTracksuitBottoms(style: Style): Pants {
     return pants
 }
 
-fun createBikeShorts(style: Style): Pants {
+fun createBikeShorts(style: Style, variant: Variant?, colourParam: Colour?, lengthParam: Length?, topType: TopType?, flagsParam: Map<Flag, Boolean>): Pants {
     val length = Length.THIGH
     val flags = listOf(Flag.CLINGY, Flag.PULL_DOWN)
     val basicDesc = "bike shorts"
-    val colour: Colour = getPantsColour(style)
+    val colour: Colour = colourParam ?: getPantsColour(style)
     val shortDesc = colour.desc + " " + basicDesc
     val detailDesc = getPantsDetail(shortDesc, length, flags) + "\nSkin-tight shorts used for exercise. "
     val pants = Pants(listOf(OutfitType.ATHLETIC), 0, colour, 2, -3, -3, shortDesc, 30, basicDesc, length, detailDesc)

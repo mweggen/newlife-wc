@@ -386,3 +386,242 @@ fun createSlip(style: Style, variantParam: Variant?, colourParam: Colour?, lengt
     flags.forEach(dress::addFlag)
     return dress
 }
+
+fun createDress(style: Style, variantParam: Variant?, colourParam: Colour?, lengthParam: Length?,
+                topTypeParam: TopType?, flagsParam: Map<Flag, Boolean>): Dress {
+    val flags = mutableListOf(Flag.SINGULAR)
+    var attractive = 6
+    var cute = 1
+    var elegant = 2
+    val length = lengthParam ?: getDressLength(style)
+    if (length == Length.THIGH) {
+        attractive += 2
+        cute -= 3
+        elegant -= 2
+    } else if (length == Length.ANKLES) {
+        elegant += 4
+    }
+    val variant = variantParam ?: when (length) {
+        Length.THIGH -> when (style) {
+            Style.CUTE -> when (rnd10()) {
+                in 0..5 -> Variant.SKATER_DRESS
+                6, 7, 8 -> Variant.PINAFORE_DRESS
+                else -> Variant.SLIP_DRESS
+            }
+            Style.WHOLESOME -> when (rnd10()) {
+                in 0..3 -> Variant.SKATER_DRESS
+                4, 5, 6 -> Variant.PINAFORE_DRESS
+                else -> Variant.SLIP_DRESS
+            }
+            Style.PROVOCATIVE -> when (rnd10()) {
+                in 0..6 -> Variant.BODYCON_DRESS
+                else -> Variant.SLIP_DRESS
+            }
+            Style.BUSINESSLIKE, Style.ELEGANT -> when (rnd10()) {
+                in 0..4 -> Variant.SKATER_DRESS
+                5, 6, 7 -> Variant.BODYCON_DRESS
+                else -> Variant.SLIP_DRESS
+            }
+            else -> when (rnd10()) {
+                0, 1, 2 -> Variant.SKATER_DRESS
+                3, 4, 5 -> Variant.BODYCON_DRESS
+                6, 7 -> Variant.PINAFORE_DRESS
+                else -> Variant.SLIP_DRESS
+            }
+        }
+        Length.KNEES -> when (style) {
+            Style.BUSINESSLIKE -> when (rnd10()) {
+                in 0..5 -> Variant.SHIFT_DRESS
+                6, 7 -> Variant.SHEATH_DRESS
+                8 -> Variant.SKATER_DRESS
+                else -> Variant.SLIP_DRESS
+            }
+            Style.ELEGANT -> when (rnd10()) {
+                0, 1, 2 -> Variant.SHIFT_DRESS
+                3, 4, 5 -> Variant.SHEATH_DRESS
+                6 -> Variant.SKATER_DRESS
+                else -> Variant.SLIP_DRESS
+            }
+            Style.SCRUFFY -> when (rnd10()) {
+                0, 1, 2 -> Variant.SKATER_DRESS
+                3, 4 -> Variant.PINAFORE_DRESS
+                else -> Variant.SLIP_DRESS
+            }
+            Style.CHEERFUL -> when (rnd10()) {
+                in 0..4 -> Variant.SKATER_DRESS
+                5, 6, 7 -> Variant.PINAFORE_DRESS
+                else -> Variant.SLIP_DRESS
+            }
+            Style.CUTE -> when (rnd10()) {
+                0 -> Variant.SHIFT_DRESS
+                1 -> Variant.SHEATH_DRESS
+                2, 3 -> Variant.PINAFORE_DRESS
+                in 4..7 -> Variant.SKATER_DRESS
+                else -> Variant.SLIP_DRESS
+            }
+            Style.PROVOCATIVE -> when (rnd10()) {
+                0, 1, 2 -> Variant.SHIFT_DRESS
+                in 3..7 -> Variant.SHEATH_DRESS
+                else -> Variant.SLIP_DRESS
+            }
+            else -> when (rnd10()) {
+                0, 1 -> Variant.SHIFT_DRESS
+                2, 3 -> Variant.SHEATH_DRESS
+                4, 5 -> Variant.SKATER_DRESS
+                6, 7 -> Variant.PINAFORE_DRESS
+                else -> Variant.SLIP_DRESS
+            }
+        }
+        else -> Variant.MAXI_DRESS
+    }
+    val st = when (variant) {
+        Variant.SKATER_DRESS -> "skater dress"
+        Variant.BODYCON_DRESS -> "bodycon dress"
+        Variant.PINAFORE_DRESS -> "pinafore dress"
+        Variant.SLIP_DRESS -> "slip dress"
+        Variant.SHIFT_DRESS -> "shift dress"
+        Variant.SHEATH_DRESS -> "sheath dress"
+        else /*Variant.MAXI_DRESS*/ -> "maxi dress"
+    }
+    val detailDesc = when (variant) {
+        Variant.SKATER_DRESS -> "Skater dresses are a cute and feminine style. This one is only really suitable for going out in. "
+        Variant.BODYCON_DRESS -> "Bodycon, short for \"body-conscious\" is a dress that clings tightly to your body. This one is only really suitable for going out in. "
+        Variant.PINAFORE_DRESS -> "A sleeveless, collarless dress similar in appearance to pinny-style aprons and apparently called a \"jumper\" in American English. It's a very cute type of dress that you could wear out or just in day-to-day activities. "
+        Variant.SLIP_DRESS -> "This dress is a bit too 'nice' to be casual clothing, but you could wear it to a club or on a date. "
+        Variant.SHIFT_DRESS -> "A classic style of dress with straight lines that doesn't hug the waist. You could wear it on a night out, but it's also suitable for business wear. "
+        Variant.SHEATH_DRESS -> "A simple style of figure-hugging dress. This one is only really suited for nights out. "
+        else /*Variant.MAXI_DRESS*/ -> "A long dress, this one isn't really suitable for casual occasions - it's the sort of thing you'd wear to a club or on a date. "
+    }
+    val topType = when (variant) {
+        Variant.PINAFORE_DRESS, Variant.SHIFT_DRESS -> TopType.ZIP
+        Variant.SLIP_DRESS -> TopType.STRAPPY
+        else -> topTypeParam
+                ?: if (variant == Variant.SHEATH_DRESS && ThreadLocalRandom.current().nextBoolean()) TopType.ZIP
+                else getTopType(style)
+    }
+    when (topType) {
+        TopType.ZIP -> elegant += 2
+        TopType.BUTTONS -> {
+            cute += 2; elegant -= 1
+        }
+        TopType.HALTERTOP -> {
+            cute -= 1; elegant += 1
+        }
+        TopType.STRAPLESS -> cute -= 2
+    }
+    val colour = colourParam ?: if (variant == Variant.SHIFT_DRESS) when (rnd10()) {
+        in 0..3 -> Colour.BLACK
+        4, 5 -> Colour.GREY
+        6 -> Colour.WHITE
+        7 -> Colour.BROWN
+        8 -> Colour.BLUE
+        else -> Colour.GREEN
+    } else getColour(style)
+
+    when (colour) {
+        Colour.WHITE -> cute += 1
+        Colour.PINK -> cute += 3
+        Colour.BLACK, Colour.RED -> cute -= 1
+        Colour.ORANGE -> elegant -= 1
+    }
+
+    val outfitTypes = when (variant) {
+        Variant.PINAFORE_DRESS -> listOf(OutfitType.GOING_OUT, OutfitType.CASUAL)
+        Variant.SHIFT_DRESS -> listOf(OutfitType.BUSINESS, OutfitType.GOING_OUT)
+        else -> listOf(OutfitType.GOING_OUT)
+    }
+    if (variant != Variant.PINAFORE_DRESS && topType != TopType.STRAPLESS && topType != TopType.HALTERTOP &&
+            flagsParam.getOrDefault(Flag.LOW_CUT, rnd10() < when (style) {
+                Style.WHOLESOME, Style.CUTE -> 0
+                Style.PROVOCATIVE -> 9
+                Style.BUSINESSLIKE -> 4
+                else -> 5
+            })) {
+        flags += Flag.LOW_CUT
+        attractive += 1
+        cute -= 3
+        elegant -= 2
+    }
+    if (flagsParam.getOrDefault(Flag.THIN, rnd10() < when (style) {
+                Style.WHOLESOME -> 0
+                Style.PROVOCATIVE -> 8
+                Style.CUTE -> 4
+                else -> 5
+            })) {
+        flags += Flag.THIN
+        attractive += 2
+        cute -= 2
+    }
+    if (variant != Variant.SKATER_DRESS && variant != Variant.PINAFORE_DRESS && variant != Variant.SHIFT_DRESS &&
+            flagsParam.getOrDefault(Flag.SEE_THROUGH, rnd10() < when (style) {
+                Style.WHOLESOME, Style.CUTE, Style.ELEGANT, Style.BUSINESSLIKE -> 0
+                Style.PROVOCATIVE -> 4
+                else -> 1
+            })) {
+        flags += Flag.SEE_THROUGH
+        attractive += 2
+        cute -= 6
+        elegant -= 6
+    }
+    if (variant == Variant.BODYCON_DRESS || (variant == Variant.SHEATH_DRESS &&
+                    flagsParam.getOrDefault(Flag.CLINGY, style != Style.WHOLESOME &&
+                            ThreadLocalRandom.current().nextInt(8) == 0))) {
+        flags += Flag.CLINGY
+        attractive += 1
+        cute -= 4
+    }
+    when (variant) {
+        Variant.SKATER_DRESS -> cute += 4
+        Variant.PINAFORE_DRESS -> {
+            cute += 6; elegant -= 3
+        }
+        Variant.SHIFT_DRESS, Variant.SHEATH_DRESS -> elegant += 1
+    }
+    if (length == Length.THIGH && (variant == Variant.SKATER_DRESS || variant == Variant.PINAFORE_DRESS)) cute += 2
+
+    val shortDesc = (if (variant == Variant.PINAFORE_DRESS && length == Length.THIGH) "short " else "") +
+            (if (Flag.THIN in flags) "thin " else "") + colour.desc + " " + st
+
+    val price = 35 + (if (Flag.CLINGY in flags) 5 else 0) + (if (length == Length.ANKLES) 5 else 0)
+
+    val dress = Dress(outfitTypes, colour, length, topType, attractive, cute, elegant, shortDesc, "dress", st,
+            detailDesc, price)
+    flags.forEach(dress::addFlag)
+    return dress
+}
+
+fun getTopType(style: Style): TopType {
+    return when (style) {
+        Style.CUTE -> when (rnd10()) {
+            in 0..3 -> TopType.STRAPPY
+            4, 5 -> TopType.ZIP
+            6, 7 -> TopType.BUTTONS
+            8 -> TopType.HALTERTOP
+            else -> TopType.STRAPLESS
+        }
+        Style.WHOLESOME -> when (rnd10()) {
+            in 0..3 -> TopType.STRAPPY
+            4, 5, 6 -> TopType.ZIP
+            7, 8 -> TopType.BUTTONS
+            else -> if (ThreadLocalRandom.current().nextBoolean()) TopType.HALTERTOP else TopType.STRAPLESS
+        }
+        Style.PROVOCATIVE -> when (rnd10()) {
+            in 0..3 -> TopType.STRAPPY
+            4, 5 -> TopType.HALTERTOP
+            else -> TopType.STRAPLESS
+        }
+        Style.ELEGANT -> when (rnd10()) {
+            in 0..3 -> TopType.STRAPPY
+            in 4..7 -> TopType.ZIP
+            8 -> TopType.HALTERTOP
+            else -> TopType.STRAPLESS
+        }
+        else -> when (rnd10()) {
+            in 0..4 -> TopType.STRAPPY
+            5, 6 -> TopType.ZIP
+            7 -> TopType.BUTTONS
+            8 -> TopType.HALTERTOP
+            else -> TopType.STRAPLESS
+        }
+    }
+}
