@@ -167,7 +167,7 @@ class Test : Application() {
                 colourChoiceBox.items.setAll((if (newValue.colours.size > 1) setOf(Colour.ANY) else setOf()) +
                         newValue.colours.sortedWith(compareBy { it.desc }))
 
-                flagBoxes.values.forEach{
+                flagBoxes.values.forEach {
                     it.isDisable = true
                     it.isIndeterminate = false
                     it.isSelected = false
@@ -181,9 +181,9 @@ class Test : Application() {
                 }
 
             } else {
-                if (subCategories.value == SubCategory.ANY){
+                if (subCategories.value == SubCategory.ANY) {
                     createButton.isDisable = true
-                    flagBoxes.values.forEach{
+                    flagBoxes.values.forEach {
                         it.isDisable = false
                         it.isIndeterminate = true
                         it.isSelected = false
@@ -193,7 +193,7 @@ class Test : Application() {
                     val mandatoryFlags = selectedVariants.flatMap { it.mandatoryFlags }.distinct()
                     val optionalFlags = selectedVariants.flatMap { it.optionalFlags }.distinct()
 
-                    flagBoxes.values.forEach{
+                    flagBoxes.values.forEach {
                         it.isDisable = true
                         it.isIndeterminate = false
                         it.isSelected = false
@@ -446,9 +446,39 @@ enum class SubCategory(val category: Category, val create: (s: Style, v: Variant
     BABYDOLL(Category.DRESS, ::createBabydoll),
     SLIP(Category.DRESS, ::createSlip),
     SUMMER_DRESS(Category.DRESS, ::createSummerDress),
+    //TODO santa dresses
 
+    WORK_SKIRT(Category.SKIRT),
     SPORTS_SKIRT(Category.SKIRT, ::createSportsSkirt),
-    SKIRT(Category.SKIRT, ::createSkirt);
+    DENIM_SKIRT(Category.SKIRT),
+    SKIRT(Category.SKIRT, ::createSkirt),
+
+    WORK_TROUSERS(Category.PANTS),
+    YOGA_PANTS(Category.PANTS),
+    TRACKSUIT_BOTTOMS(Category.PANTS),
+    PYJAMA_BOTTOMS(Category.PANTS),
+    HOTPANTS(Category.PANTS),
+    BIKE_SHORTS(Category.PANTS),
+    SHORTS(Category.PANTS),
+    JEANS(Category.PANTS),
+
+    NIGHTGOWN(Category.NIGHTGOWN),
+    NIGHTIE(Category.NIGHTIE),
+
+    BRA(Category.BRA),
+    SPORTS_BRA(Category.BRA),
+
+    PANTIES(Category.PANTIES),
+
+    SOCKS(Category.LEGWEAR),
+    STOCKINGS(Category.LEGWEAR),
+
+    TANK_TOP(Category.TOP),
+    CAMISOLE(Category.TOP),
+    PYJAMA_TOP(Category.TOP),
+    BLOUSE(Category.TOP),
+    SHEER_BLOUSE(Category.TOP),
+    TOP(Category.TOP);
 
     override fun toString() = readable(name)
 }
@@ -457,6 +487,7 @@ enum class Variant(val subCategory: SubCategory, val topTypes: Collection<TopTyp
                    val mandatoryFlags: Collection<Flag>, val optionalFlags: Collection<Flag>, val outfitTypes: Collection<OutfitType>,
                    val colours: Collection<Colour>) {
     ANY(SubCategory.ANY, setOf(), setOf(), setOf(), setOf(), setOf(), setOf()),
+
 
     FLAMENCO(SubCategory.FLAMENCO, setOf(ZIP), setOf(ANKLES), setOf(SINGULAR, DANCE),
             setOf(LOW_CUT, THIN, CLINGY), setOf(GOING_OUT, FORMAL), setOf(WHITE, BLACK, RED, YELLOW, PURPLE, GREEN)),
@@ -486,6 +517,7 @@ enum class Variant(val subCategory: SubCategory, val topTypes: Collection<TopTyp
     SUMMER_DRESS(SubCategory.SUMMER_DRESS, setOf(STRAPPY, ZIP, BUTTONS, HALTERTOP), setOf(THIGH, ANKLES, KNEES), setOf(SINGULAR, THIN),
             setOf(LOW_CUT), setOf(CASUAL), setOf(WHITE, PINK, YELLOW, RED, GREEN, PURPLE, ORANGE, BLUE, CREAM, BLACK, BROWN, GREY)),
 
+
     TENNIS_STYLE(SubCategory.SPORTS_SKIRT, setOf(), setOf(THIGH), setOf(SINGULAR), setOf(), setOf(ATHLETIC), setOf(RED, BLUE, YELLOW, WHITE, BLACK, GREY)),
     SPORTS_SKIRT(SubCategory.SPORTS_SKIRT, setOf(), setOf(THIGH), setOf(SINGULAR), setOf(CLINGY), setOf(ATHLETIC), setOf(RED, BLUE, YELLOW, WHITE, BLACK, GREY, PINK, GREEN, ORANGE)),
 
@@ -502,13 +534,91 @@ enum class Variant(val subCategory: SubCategory, val topTypes: Collection<TopTyp
 
     MAXI_SKIRT(SubCategory.SKIRT, setOf(), setOf(ANKLES), setOf(SINGULAR), setOf(CLINGY), setOf(GOING_OUT, CASUAL), outerColours),
 
+    WORK_SKIRT(SubCategory.WORK_SKIRT, setOf(), setOf(THIGH), setOf(SINGULAR), setOf(CLINGY), setOf(BUSINESS), setOf(BLACK, BLUE, PURPLE, GREEN, RED, YELLOW, GREY, BROWN, WHITE)),
+    PENCIL_SUIT_SKIRT(SubCategory.WORK_SKIRT, setOf(), setOf(KNEES, ANKLES), setOf(SINGULAR), setOf(CLINGY), setOf(BUSINESS), setOf(BLACK, BLUE, PURPLE, GREEN, RED, YELLOW, GREY, BROWN, WHITE)),
+
+    DENIM_SKIRT(SubCategory.DENIM_SKIRT, setOf(), setOf(THIGH, KNEES), setOf(SINGULAR), setOf(), setOf(CASUAL), setOf(BLUE, BLACK, WHITE, PINK, GREY, RED, YELLOW)),
+
+
+    FULL_CUP_BRA(SubCategory.BRA, setOf(), setOf(), setOf(), setOf(LACY), normalOutfitTypes, underColours),
+    DEMI_CUP_BRA(SubCategory.BRA, setOf(), setOf(), setOf(), setOf(LACY), normalOutfitTypes, underColours),
+    BALCONY_BRA(SubCategory.BRA, setOf(), setOf(), setOf(), setOf(LACY), normalOutfitTypes, underColours),
+    PLUNGE_BRA(SubCategory.BRA, setOf(), setOf(), setOf(), setOf(LACY), normalOutfitTypes, underColours),
+    BRALETTE(SubCategory.BRA, setOf(), setOf(), setOf(), setOf(LACY), normalOutfitTypes, underColours),
+
+    SPORTS_BRA(SubCategory.SPORTS_BRA, setOf(), setOf(), setOf(), setOf(), setOf(ATHLETIC), setOf(WHITE, PINK, YELLOW, RED, GREEN, BLUE, BLACK, GREY, PURPLE)),
+
+
+    NIGHTIE(SubCategory.NIGHTIE, setOf(BUTTONS, ZIP, STRAPPY), setOf(THIGH, KNEES), setOf(SINGULAR), setOf(LOW_CUT, THIN), setOf(NIGHTWEAR), setOf(WHITE, PINK, BLACK, YELLOW, BLUE)),
+
+    NIGHTGOWN(SubCategory.NIGHTGOWN, setOf(BUTTONS, ZIP, STRAPPY), setOf(KNEES, ANKLES), setOf(SINGULAR), setOf(LOW_CUT, THIN), setOf(NIGHTWEAR), setOf(WHITE, BLACK, BLUE, RED, YELLOW, CREAM)),
+
+
+    WORK_TROUSERS(SubCategory.WORK_TROUSERS, setOf(), setOf(ANKLES), setOf(), setOf(), setOf(BUSINESS), setOf(BLACK, BROWN, GREY, WHITE)),
+
+    YOGA_PANTS(SubCategory.YOGA_PANTS, setOf(), setOf(ANKLES), setOf(CLINGY, PULL_DOWN, BOOST_ATHLETIC_ELEGANCE), setOf(), setOf(ATHLETIC, CASUAL), athleticLongPantsColours),
+
+    TRACKSUIT_BOTTOMS(SubCategory.TRACKSUIT_BOTTOMS, setOf(), setOf(ANKLES), setOf(PULL_DOWN), setOf(), setOf(ATHLETIC, CASUAL), athleticLongPantsColours),
+
+    PYJAMA_BOTTOMS(SubCategory.PYJAMA_BOTTOMS, setOf(), setOf(THIGH, ANKLES), setOf(PULL_DOWN), setOf(THIN), setOf(NIGHTWEAR), pyjamaColours),
+    SILK_PYJAMA_BOTTOMS(SubCategory.PYJAMA_BOTTOMS, setOf(), setOf(THIGH, ANKLES), setOf(SILK, PULL_DOWN), setOf(THIN), setOf(NIGHTWEAR), silkPyjamaColours),
+
+    HOTPANTS(SubCategory.HOTPANTS, setOf(), setOf(THIGH), setOf(CLINGY), setOf(LOW_RISE), setOf(GOING_OUT, CASUAL), jeansColours),
+
+    BIKE_SHORTS(SubCategory.BIKE_SHORTS, setOf(), setOf(THIGH), setOf(CLINGY, PULL_DOWN), setOf(), setOf(ATHLETIC), jeansColours),
+
+    DENIM_SHORTS(SubCategory.SHORTS, setOf(), setOf(THIGH), setOf(), setOf(CLINGY, LOW_RISE), setOf(CASUAL), jeansColours),
+    CHINO_SHORTS(SubCategory.SHORTS, setOf(), setOf(THIGH), setOf(), setOf(CLINGY, LOW_RISE), setOf(CASUAL), outerColours),
+    SHORTS(SubCategory.SHORTS, setOf(), setOf(KNEES, THIGH), setOf(), setOf(CLINGY, LOW_RISE), setOf(CASUAL), outerColours),
+
+    SKINNY_JEANS(SubCategory.JEANS, setOf(), setOf(ANKLES), setOf(CLINGY), setOf(LOW_RISE), setOf(CASUAL), jeansColours),
+    DESIGNER_SKINNY_JEANS(SubCategory.JEANS, setOf(), setOf(ANKLES), setOf(CLINGY), setOf(LOW_RISE), setOf(CASUAL, GOING_OUT), jeansColours),
+    STRAIGHT_LEG_JEANS(SubCategory.JEANS, setOf(), setOf(ANKLES), setOf(CLINGY), setOf(LOW_RISE), setOf(CASUAL), jeansColours),
+    DESIGNER_STRAIGHT_LEG_JEANS(SubCategory.JEANS, setOf(), setOf(ANKLES), setOf(CLINGY), setOf(LOW_RISE), setOf(CASUAL, GOING_OUT), jeansColours),
+    BOOTCUT_JEANS(SubCategory.JEANS, setOf(), setOf(ANKLES), setOf(), setOf(LOW_RISE), setOf(CASUAL), jeansColours),
+    DESIGNER_BOOTCUT_JEANS(SubCategory.JEANS, setOf(), setOf(ANKLES), setOf(), setOf(LOW_RISE), setOf(CASUAL, GOING_OUT), jeansColours),
+
+
+    THONG(SubCategory.PANTIES, setOf(), setOf(), setOf(SINGULAR), setOf(THIN, LACY), setOf(CASUAL, GOING_OUT, NIGHTWEAR, BUSINESS, SEXY_NIGHTWEAR), underColours),
+    G_STRING(SubCategory.PANTIES, setOf(), setOf(), setOf(SINGULAR), setOf(THIN, LACY), setOf(CASUAL, GOING_OUT, NIGHTWEAR, BUSINESS, SEXY_NIGHTWEAR), underColours),
+    HIGH_LEG_PANTIES(SubCategory.PANTIES, setOf(), setOf(), setOf(), setOf(THIN, LACY), setOf(CASUAL, GOING_OUT, NIGHTWEAR, BUSINESS, SEXY_NIGHTWEAR, ATHLETIC), underColours),
+    BOYSHORTS(SubCategory.PANTIES, setOf(), setOf(), setOf(), setOf(THIN, LACY), setOf(CASUAL, GOING_OUT, NIGHTWEAR, BUSINESS, SEXY_NIGHTWEAR, ATHLETIC), underColours),
+    HIPSTER_PANTIES(SubCategory.PANTIES, setOf(), setOf(), setOf(), setOf(THIN, LACY), setOf(CASUAL, GOING_OUT, NIGHTWEAR, BUSINESS, SEXY_NIGHTWEAR, ATHLETIC), underColours),
+    CLASSIC_BRIEFS(SubCategory.PANTIES, setOf(), setOf(), setOf(), setOf(THIN, LACY), setOf(CASUAL, GOING_OUT, NIGHTWEAR, BUSINESS, SEXY_NIGHTWEAR, ATHLETIC), underColours),
+
+
+    VEST(SubCategory.TANK_TOP, setOf(STRAPPY), setOf(), setOf(), setOf(CLINGY, LOW_CUT, THIN, SHOWS_TUMMY, THICK_STRAPS), setOf(ATHLETIC, CASUAL), outerColours),
+    TANK_TOP(SubCategory.TANK_TOP, setOf(STRAPPY), setOf(), setOf(THICK_STRAPS), setOf(CLINGY, LOW_CUT, THIN, SHOWS_TUMMY), setOf(ATHLETIC, CASUAL), outerColours),
+
+    CAMISOLE(SubCategory.CAMISOLE, setOf(STRAPPY), setOf(), setOf(THIN), setOf(LOW_CUT, SEE_THROUGH), setOf(SEXY_NIGHTWEAR), setOf(BLACK, RED, WHITE, PINK, BLUE, YELLOW)),
+
+    PYJAMA_TOP(SubCategory.PYJAMA_TOP, setOf(BUTTONS), setOf(), setOf(), setOf(THIN), setOf(NIGHTWEAR), pyjamaColours),
+    SILK_PYJAMA_TOP(SubCategory.PYJAMA_TOP, setOf(BUTTONS), setOf(), setOf(SILK), setOf(THIN), setOf(NIGHTWEAR), silkPyjamaColours),
+
+    BLOUSE(SubCategory.BLOUSE, setOf(BUTTONS), setOf(), setOf(), setOf(LOW_CUT, THIN), setOf(BUSINESS), blouseColours),
+
+    SHEER_BLOUSE(SubCategory.SHEER_BLOUSE, setOf(BUTTONS), setOf(), setOf(THIN, SEE_THROUGH), setOf(LOW_CUT, SHOWS_TUMMY), setOf(GOING_OUT), outerColours),
+
+    TOP(SubCategory.TOP, setOf(STRAPPY, ZIP, BUTTONS), setOf(), setOf(), setOf(LOW_CUT, THIN, CLINGY, SEE_THROUGH, SHOWS_TUMMY), setOf(GOING_OUT, CASUAL), outerColours),
+    STRAPLESS_TOP(SubCategory.TOP, setOf(HALTERTOP, TopType.STRAPLESS), setOf(), setOf(), setOf(THIN, CLINGY, SEE_THROUGH, SHOWS_TUMMY), setOf(GOING_OUT, CASUAL), outerColours)
     ;
 
     override fun toString() = readable(name)
 }
 
+val normalOutfitTypes = setOf(CASUAL, FORMAL, GOING_OUT, BUSINESS)
+val weddingOutfitTypes = setOf(CASUAL, FORMAL, GOING_OUT, BUSINESS, WEDDING)
+
 val allTopTypes = setOf(STRAPPY, ZIP, BUTTONS, HALTERTOP, STRAPLESS)
+
 val outerColours = setOf(WHITE, PINK, YELLOW, RED, PURPLE, GREEN, BLUE, CREAM, BLACK, GREY, BROWN)
+val underColours = setOf(WHITE, PINK, YELLOW, RED, PURPLE, GREEN, BLUE, CREAM, BLACK, GREY)
+val athleticLongPantsColours = setOf(BLACK, BROWN, GREY, BLUE, PINK, WHITE, RED, GREEN, ORANGE, YELLOW)
+val silkPyjamaColours = setOf(WHITE, CREAM, PINK, YELLOW, RED, BLACK)
+val pyjamaColours = setOf(WHITE, PINK, BLACK, GREEN, BLUE, YELLOW, RED, ORANGE, GREY)
+val jeansColours = setOf(BLUE, BLACK, WHITE, PINK, GREY, RED)
+val blouseColours = setOf(WHITE, PINK, YELLOW, RED, ORANGE, GREEN, BLUE, BLACK, GREY)
+
 
 enum class TopType(val undoDiff: Int = 0) {
     ANY, STRAPPY, HALTERTOP(-10), STRAPLESS(-10), SLEEVED(20), ZIP(5), BUTTONS(10);
