@@ -40,9 +40,7 @@ class Test : Application() {
         val scene = Scene(grid, 800.0, 600.0)
         stage.scene = scene
 
-//        val NO_TOP = todo
-
-        val clothingList: ObservableList<AbstractClothing> = FXCollections.observableArrayList()
+        val clothingList: ObservableList<AbstractClothing> = FXCollections.observableArrayList(BareLowerBody)
         val listView = ListView<AbstractClothing>()
 
         val pane = FlowPane()
@@ -74,6 +72,7 @@ class Test : Application() {
                 listView.selectionModel.select(selected)
             }
         }
+        val defaultClothing = setOf(BareLowerBody)
         removeButton.setOnAction {
             if (selected != null) {
                 clothingList.remove(selected)
@@ -266,6 +265,7 @@ class Test : Application() {
             if (newValue != null) {
                 addButton.isDisable = true
             }
+            removeButton.isDisable = newValue in defaultClothing
         })
         grid.add(listView, 0, 2, 1, 5)
 
@@ -332,7 +332,7 @@ interface Clothing {
 abstract class AbstractClothing(override val type: List<OutfitType>, val removeDiff: Int, colour: Colour,
                                 override val attractive: Int, override val cute: Int, override val elegant: Int,
                                 val whereWorn: List<WhereWorn>, override val shortDesc: String, val basePrice: Int) : Clothing {
-    val price = (basePrice..basePrice * 2).random()
+    val price = if (basePrice > 0) (basePrice..basePrice * 2).random() else 0
     private val flags = HashSet<Flag>()
 
     abstract val detailDesc: String
@@ -439,28 +439,28 @@ enum class Category(val whereWorn: Set<WhereWorn>) {
     override fun toString() = readable(name)
 }
 
-enum class SubCategory(val category: Category, val create: (s: Style, v: Variant?, c: Colour?, l: Length?, tt: TopType?, flags: Map<Flag, Boolean>) -> AbstractClothing = ::createSportsSkirt) {
+enum class SubCategory(val category: Category, val create: (s: Style, v: Variant?, c: Colour?, l: Length?, tt: TopType?, flags: Map<Flag, Boolean>) -> AbstractClothing = Skirt.Companion::createSportsSkirt) {
 
     ANY(Category.ANY),
 
-    FLAMENCO(Category.DRESS, ::createFlamencoDress),
-    DRESS(Category.DRESS, ::createDress),
-    BABYDOLL(Category.DRESS, ::createBabydoll),
-    SLIP(Category.DRESS, ::createSlip),
-    SUMMER_DRESS(Category.DRESS, ::createSummerDress),
+    FLAMENCO(Category.DRESS, Dress.Companion::createFlamencoDress),
+    DRESS(Category.DRESS, Dress.Companion::createDress),
+    BABYDOLL(Category.DRESS, Dress.Companion::createBabydoll),
+    SLIP(Category.DRESS, Dress.Companion::createSlip),
+    SUMMER_DRESS(Category.DRESS, Dress.Companion::createSummerDress),
     //TODO santa dresses
 
-    WORK_SKIRT(Category.SKIRT),
-    SPORTS_SKIRT(Category.SKIRT, ::createSportsSkirt),
+    WORK_SKIRT(Category.SKIRT, Skirt.Companion::createWorkSkirt),
+    SPORTS_SKIRT(Category.SKIRT, Skirt.Companion::createSportsSkirt),
     DENIM_SKIRT(Category.SKIRT),
-    SKIRT(Category.SKIRT, ::createSkirt),
+    SKIRT(Category.SKIRT, Skirt.Companion::createSkirt),
 
-    WORK_TROUSERS(Category.PANTS, ::createWorkTrousers),
-    YOGA_PANTS(Category.PANTS, ::createYogaPants),
-    TRACKSUIT_BOTTOMS(Category.PANTS, ::createTracksuitBottoms),
+    WORK_TROUSERS(Category.PANTS, Pants.Companion::createWorkTrousers),
+    YOGA_PANTS(Category.PANTS, Pants.Companion::createYogaPants),
+    TRACKSUIT_BOTTOMS(Category.PANTS, Pants.Companion::createTracksuitBottoms),
     PYJAMA_BOTTOMS(Category.PANTS),
-    HOTPANTS(Category.PANTS),
-    BIKE_SHORTS(Category.PANTS, ::createBikeShorts),
+    HOTPANTS(Category.PANTS, Pants.Companion::createHotpants),
+    BIKE_SHORTS(Category.PANTS, Pants.Companion::createBikeShorts),
     SHORTS(Category.PANTS),
     JEANS(Category.PANTS),
 
@@ -512,7 +512,7 @@ enum class Variant(val subCategory: SubCategory, val topTypes: Collection<TopTyp
     CUTE_BABYDOLL(SubCategory.BABYDOLL, setOf(STRAPPY, HALTERTOP), setOf(THIGH), setOf(SINGULAR, THIN), setOf(LOW_CUT),
             setOf(SEXY_NIGHTWEAR), setOf(WHITE, PINK, YELLOW, PURPLE)),
     BABYDOLL(SubCategory.BABYDOLL, setOf(STRAPPY, HALTERTOP), setOf(THIGH), setOf(SINGULAR, THIN), setOf(LOW_CUT, SEE_THROUGH),
-            setOf(SEXY_NIGHTWEAR), setOf(BLACK, RED, WHITE, PINK, BLUE, YELLOW)),
+            setOf(SEXY_NIGHTWEAR), sexyUnderwearColours),
     SLIP(SubCategory.SLIP, setOf(STRAPPY, HALTERTOP), setOf(THIGH), setOf(SINGULAR, THIN), setOf(LOW_CUT), setOf(SEXY_NIGHTWEAR),
             setOf(CREAM, BLACK, RED, PURPLE, BLUE, WHITE, PINK, YELLOW, GREEN)),
 
@@ -536,7 +536,7 @@ enum class Variant(val subCategory: SubCategory, val topTypes: Collection<TopTyp
 
     MAXI_SKIRT(SubCategory.SKIRT, setOf(), setOf(ANKLES), setOf(SINGULAR), setOf(CLINGY), setOf(GOING_OUT, CASUAL), outerColours),
 
-    WORK_SKIRT(SubCategory.WORK_SKIRT, setOf(), setOf(THIGH), setOf(SINGULAR), setOf(CLINGY), setOf(BUSINESS), setOf(BLACK, BLUE, PURPLE, GREEN, RED, YELLOW, GREY, BROWN, WHITE)),
+    WORK_SKIRT(SubCategory.WORK_SKIRT, setOf(), setOf(THIGH), setOf(SINGULAR), setOf(), setOf(BUSINESS), setOf(BLACK, BLUE, PURPLE, GREEN, RED, YELLOW, GREY, BROWN, WHITE)),
     PENCIL_SUIT_SKIRT(SubCategory.WORK_SKIRT, setOf(), setOf(KNEES, ANKLES), setOf(SINGULAR), setOf(CLINGY), setOf(BUSINESS), setOf(BLACK, BLUE, PURPLE, GREEN, RED, YELLOW, GREY, BROWN, WHITE)),
 
     DENIM_SKIRT(SubCategory.DENIM_SKIRT, setOf(), setOf(THIGH, KNEES), setOf(SINGULAR), setOf(), setOf(CASUAL), setOf(BLUE, BLACK, WHITE, PINK, GREY, RED, YELLOW)),
@@ -581,18 +581,18 @@ enum class Variant(val subCategory: SubCategory, val topTypes: Collection<TopTyp
     DESIGNER_BOOTCUT_JEANS(SubCategory.JEANS, setOf(), setOf(ANKLES), setOf(), setOf(LOW_RISE), setOf(CASUAL, GOING_OUT), jeansColours),
 
 
-    THONG(SubCategory.PANTIES, setOf(), setOf(), setOf(SINGULAR), setOf(THIN, LACY), setOf(CASUAL, GOING_OUT, NIGHTWEAR, BUSINESS, SEXY_NIGHTWEAR), underColours),
-    G_STRING(SubCategory.PANTIES, setOf(), setOf(), setOf(SINGULAR), setOf(THIN, LACY), setOf(CASUAL, GOING_OUT, NIGHTWEAR, BUSINESS, SEXY_NIGHTWEAR), underColours),
-    HIGH_LEG_PANTIES(SubCategory.PANTIES, setOf(), setOf(), setOf(), setOf(THIN, LACY), setOf(CASUAL, GOING_OUT, NIGHTWEAR, BUSINESS, SEXY_NIGHTWEAR, ATHLETIC), underColours),
-    BOYSHORTS(SubCategory.PANTIES, setOf(), setOf(), setOf(), setOf(THIN, LACY), setOf(CASUAL, GOING_OUT, NIGHTWEAR, BUSINESS, SEXY_NIGHTWEAR, ATHLETIC), underColours),
-    HIPSTER_PANTIES(SubCategory.PANTIES, setOf(), setOf(), setOf(), setOf(THIN, LACY), setOf(CASUAL, GOING_OUT, NIGHTWEAR, BUSINESS, SEXY_NIGHTWEAR, ATHLETIC), underColours),
-    CLASSIC_BRIEFS(SubCategory.PANTIES, setOf(), setOf(), setOf(), setOf(THIN, LACY), setOf(CASUAL, GOING_OUT, NIGHTWEAR, BUSINESS, SEXY_NIGHTWEAR, ATHLETIC), underColours),
+    THONG(SubCategory.PANTIES, setOf(), setOf(), setOf(SINGULAR), setOf(THIN, LACY), thongOutfitTypes, underColours),
+    G_STRING(SubCategory.PANTIES, setOf(), setOf(), setOf(SINGULAR), setOf(THIN, LACY), thongOutfitTypes, underColours),
+    HIGH_LEG_PANTIES(SubCategory.PANTIES, setOf(), setOf(), setOf(), setOf(THIN, LACY), pantiesOutfitTypes, underColours),
+    BOYSHORTS(SubCategory.PANTIES, setOf(), setOf(), setOf(), setOf(THIN, LACY), pantiesOutfitTypes, underColours),
+    HIPSTER_PANTIES(SubCategory.PANTIES, setOf(), setOf(), setOf(), setOf(THIN, LACY), pantiesOutfitTypes, underColours),
+    CLASSIC_BRIEFS(SubCategory.PANTIES, setOf(), setOf(), setOf(), setOf(THIN, LACY), pantiesOutfitTypes, underColours),
 
 
     VEST(SubCategory.TANK_TOP, setOf(STRAPPY), setOf(), setOf(), setOf(CLINGY, LOW_CUT, THIN, SHOWS_TUMMY, THICK_STRAPS), setOf(ATHLETIC, CASUAL), outerColours),
     TANK_TOP(SubCategory.TANK_TOP, setOf(STRAPPY), setOf(), setOf(THICK_STRAPS), setOf(CLINGY, LOW_CUT, THIN, SHOWS_TUMMY), setOf(ATHLETIC, CASUAL), outerColours),
 
-    CAMISOLE(SubCategory.CAMISOLE, setOf(STRAPPY), setOf(), setOf(THIN), setOf(LOW_CUT, SEE_THROUGH), setOf(SEXY_NIGHTWEAR), setOf(BLACK, RED, WHITE, PINK, BLUE, YELLOW)),
+    CAMISOLE(SubCategory.CAMISOLE, setOf(STRAPPY), setOf(), setOf(THIN), setOf(LOW_CUT, SEE_THROUGH), setOf(SEXY_NIGHTWEAR), sexyUnderwearColours),
 
     PYJAMA_TOP(SubCategory.PYJAMA_TOP, setOf(BUTTONS), setOf(), setOf(), setOf(THIN), setOf(NIGHTWEAR), pyjamaColours),
     SILK_PYJAMA_TOP(SubCategory.PYJAMA_TOP, setOf(BUTTONS), setOf(), setOf(SILK), setOf(THIN), setOf(NIGHTWEAR), silkPyjamaColours),
@@ -608,18 +608,22 @@ enum class Variant(val subCategory: SubCategory, val topTypes: Collection<TopTyp
     override fun toString() = readable(name)
 }
 
+val thongOutfitTypes = setOf(CASUAL, GOING_OUT, NIGHTWEAR, BUSINESS, SEXY_NIGHTWEAR)
+val pantiesOutfitTypes = thongOutfitTypes + ATHLETIC
 val normalOutfitTypes = setOf(CASUAL, FORMAL, GOING_OUT, BUSINESS)
-val weddingOutfitTypes = setOf(CASUAL, FORMAL, GOING_OUT, BUSINESS, WEDDING)
+val weddingOutfitTypes = normalOutfitTypes + WEDDING
 
 val allTopTypes = setOf(STRAPPY, ZIP, BUTTONS, HALTERTOP, STRAPLESS)
 
-val outerColours = setOf(WHITE, PINK, YELLOW, RED, PURPLE, GREEN, BLUE, CREAM, BLACK, GREY, BROWN)
-val underColours = setOf(WHITE, PINK, YELLOW, RED, PURPLE, GREEN, BLUE, CREAM, BLACK, GREY)
-val athleticLongPantsColours = setOf(BLACK, BROWN, GREY, BLUE, PINK, WHITE, RED, GREEN, ORANGE, YELLOW)
-val silkPyjamaColours = setOf(WHITE, CREAM, PINK, YELLOW, RED, BLACK)
-val pyjamaColours = setOf(WHITE, PINK, BLACK, GREEN, BLUE, YELLOW, RED, ORANGE, GREY)
-val jeansColours = setOf(BLUE, BLACK, WHITE, PINK, GREY, RED)
-val blouseColours = setOf(WHITE, PINK, YELLOW, RED, ORANGE, GREEN, BLUE, BLACK, GREY)
+val underColours =          setOf(WHITE, BLACK, RED, BLUE, GREEN, YELLOW, PINK, GREY, CREAM, PURPLE)
+val outerColours = underColours + BROWN
+
+val athleticLongPantsColours= setOf(WHITE, BLACK, RED, BLUE, GREEN, YELLOW, PINK, GREY, BROWN, ORANGE)
+val silkPyjamaColours       = setOf(WHITE, BLACK, RED, YELLOW, PINK, CREAM)
+val pyjamaColours           = setOf(WHITE, BLACK, RED, BLUE, GREEN, YELLOW, PINK, GREY, ORANGE)
+val blouseColours           = setOf(WHITE, BLACK, RED, BLUE, GREEN, YELLOW, PINK, GREY, ORANGE)
+val jeansColours            = setOf(WHITE, BLACK, RED, BLUE, PINK, GREY)
+val sexyUnderwearColours    = setOf(WHITE, BLACK, RED, BLUE, YELLOW, PINK)
 
 
 enum class TopType(val undoDiff: Int = 0) {
